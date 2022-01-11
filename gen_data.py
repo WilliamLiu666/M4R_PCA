@@ -16,6 +16,16 @@ def generation(nrow,ncol):
     
     return x
 
+def generation_with_label(nrow,ncol):
+    
+    x=datasets.make_moons(n_samples=nrow)
+    label = x[1]
+    y=np.zeros((nrow,ncol))#zeros 
+    x=np.concatenate((x[0],y),axis=1)#extend to higher dimensions
+    
+    return x,label
+
+
 def normalize(X):
 
     z = preprocessing.normalize(X,axis=1)
