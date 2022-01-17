@@ -12,8 +12,9 @@ def true_pca(x,ncol,num):
     pca = PCA(n_components=(ncol+2), svd_solver='full')
     pca.fit(x)
     pca_end = time.time()
+    result = pca.components_.T
     #print('Time taken for PCA',pca_end-pca_start)
     #print('varaince ratio:')
     #print(pca.explained_variance_ratio_[:5])
     
-    return pca.components_[:,:num]
+    return result[:,:num]

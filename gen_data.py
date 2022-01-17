@@ -29,25 +29,19 @@ def generation_with_label(nrow,ncol):
 def normalize(X):
 
     z = preprocessing.normalize(X,axis=1)
+    
     return z
-    
-    '''
-    r=(X.max(axis=0) - X.min(axis=0))
-    r[r==0]=1
-    X_std = (X - X.min(axis=0)) / r
-    X_scaled = X_std * (X.max(axis=0) - X.min(axis=0)) + X.min(axis=0)
-    return X_scaled
 
-    mu = np.mean(X, axis=0)
-    std = np.std(X, axis=0)
-    std_filled = std.copy()
-    std_filled[std==0] = 1.
-    Xbar = ((X-mu)/std_filled)
+def standardize(X):
     
-    return Xbar
     '''
+    mean = np.mean(X,axis=1)
+    mean = mean.reshape(len(mean),1)
+    '''
+    mean = np.mean(X,axis=0)
+    X = X-mean#centralise
     
-    
+    return X
 
 def init_V(ncol,num):
     
