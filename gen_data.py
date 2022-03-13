@@ -32,16 +32,13 @@ def normalize(X):
     
     return z
 
-def standardize(X):
+def centralize(X):
     
-    '''
-    mean = np.mean(X,axis=1)
-    mean = mean.reshape(len(mean),1)
-    '''
-    mean = np.mean(X,axis=0)
-    X = X-mean#centralise
+    t = np.mean(X,axis=0)
+    #t = t.reshape((len(t),1))
+    z = X-t
     
-    return X
+    return z 
 
 def init_V(ncol,num):
     

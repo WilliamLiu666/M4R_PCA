@@ -15,6 +15,6 @@ def true_pca(x,ncol,num):
     result = pca.components_.T
     #print('Time taken for PCA',pca_end-pca_start)
     #print('varaince ratio:')
-    #print(pca.explained_variance_ratio_[:5])
+    print(pca.explained_variance_ratio_[:5])
     
     return result[:,:num]
