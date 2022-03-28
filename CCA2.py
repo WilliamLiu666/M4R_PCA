@@ -19,10 +19,7 @@ def streamingCCA(X,Y,n):
     
     corr_list = np.zeros((n,100))
     
-    covx = np.zeros((m,m))
-    covy = np.zeros((m,m))
-    
-    eta = 0.0025
+    eta = 0.001
     for j in range(0,30):
         print(j)
         for i in range(500):
@@ -32,20 +29,18 @@ def streamingCCA(X,Y,n):
             y = Y[ind,:]
     
             c12 = np.outer(x,y)
-            
-            covx = (covx*ind+np.outer(x,x))/(ind+1)
-            covy = (covy*ind+np.outer(y,y))/(ind+1)
-            
+    
             a += eta*c12@b
-            a,ar = np.linalg.qr(a, mode='reduced')            
-            #for k in range(n):
-                #a[:,k] = a[:,k]/np.sqrt(a[:,k].T@covx@a[:,k])
+            a,ar = np.linalg.qr(a, mode='reduced')
+            
+            for k in range(n):
+                a[:,k] = a[:,k]/np.sqrt(a[:,k].T@X[:ind+1,:].T@X[:ind+1,:]@a[:,k])
             a = a*np.sign(np.diagonal(ar))
     
             b += eta*c12.T@a
             b,br = np.linalg.qr(b, mode='reduced')
-            #for k in range(n):
-                #b[:,k] = b[:,k]/np.sqrt(b[:,k].T@covy@b[:,k])
+            for k in range(n):
+                b[:,k] = b[:,k]/np.sqrt(b[:,k].T@Y[:ind+1,:].T@Y[:ind+1,:]@b[:,k])
             b = b*np.sign(np.diagonal(br))
     
         X_s = X@a
@@ -53,7 +48,7 @@ def streamingCCA(X,Y,n):
         for k in range(n):
             corr_list[k,j] = np.corrcoef(X_s.T,Y_s.T)[n+k,k]
     
-    eta = 0.0025
+    eta = 0.001
     for j in range(30,100):
         print(j)
         for i in range(500):
@@ -67,14 +62,14 @@ def streamingCCA(X,Y,n):
             a += eta*c12@b
             a,ar = np.linalg.qr(a, mode='reduced')
             
-            #for k in range(n):
-                #a[:,k] = a[:,k]/np.sqrt(a[:,k].T@covx@a[:,k])
+            for k in range(n):
+                a[:,k] = a[:,k]/np.sqrt(a[:,k].T@X[:ind+1,:].T@X[:ind+1,:]@a[:,k])
             a = a*np.sign(np.diagonal(ar))
     
             b += eta*c12.T@a
             b,br = np.linalg.qr(b, mode='reduced')
-            #for k in range(n):
-                #b[:,k] = b[:,k]/np.sqrt(b[:,k].T@covy@b[:,k])
+            for k in range(n):
+                b[:,k] = b[:,k]/np.sqrt(b[:,k].T@Y[:ind+1,:].T@Y[:ind+1,:]@b[:,k])
             b = b*np.sign(np.diagonal(br))
     
         X_s = X@a
@@ -119,7 +114,6 @@ def my_CCA(X,Y,n):
 if __name__=='__main__':
     '''
     import matplotlib.pyplot as plt
-    from sklearn.cross_decomposition import CCA
     
     l1 = np.random.normal(size=100000)
     l2 = np.random.normal(size=100000)
@@ -132,25 +126,42 @@ if __name__=='__main__':
     X = X-X.mean(axis=0)
     Y = Y-Y.mean(axis=0)
     '''
+    
+    from gen_data import *
     from sklearn.cross_decomposition import CCA
     import matplotlib.pyplot as plt
+    
+    '''
+    from keras.datasets import mnist
+    x = mnist.load_data()[0][0]
+    x = x.reshape(-1,28*28)
+    x = x/255+1e-3
+    num = 4
+    n_features = 28*28
+    xn = centralize(x)
+    
+    X = xn[:,:392]
+    Y = xn[:,392:]
+    '''
     import numpy as np
+    import scipy.linalg
+    import scipy.sparse
     import tensorflow as tf
     x = tf.keras.datasets.cifar10.load_data()[0][0]
     x = x.reshape(-1,32*32*3)
     x = x/255
-    x = (x - x.mean(axis=0))
-    X = x[:,1526:1531]
-    Y = x[:,2536:2541]
-    #'''
-    a,b,corr_list = streamingCCA(X, Y, n=5)
-    cca = CCA(n_components=5,max_iter=60000)
+    x = (x - x.mean(axis=0))/x.std(axis=0)
+    X = x[:,:5]
+    Y = x[:,330:335]
+
+    a,b,corr_list = streamingCCA(X, Y, n=3)
+    cca = CCA(n_components=3,max_iter=60000)
     cca.fit(X, Y)
     X_c, Y_c = cca.transform(X, Y)
     
-    for i in range(5):
+    for i in range(3):
         plt.plot(np.array(list(range(1,101)))*500,corr_list[i,:],label='streaming method {}'.format(i))
-        plt.plot([100,50000],[np.corrcoef(X_c.T,Y_c.T)[5+i,i],np.corrcoef(X_c.T,Y_c.T)[5+i,i]],label='built-in cca function {}'.format(i))
+        plt.plot([100,60000],[np.corrcoef(X_c.T,Y_c.T)[3+i,i],np.corrcoef(X_c.T,Y_c.T)[3+i,i]],label='my cca function {}'.format(i))
         plt.xlabel('iterations')
         plt.ylabel('correlation')
         plt.legend()
