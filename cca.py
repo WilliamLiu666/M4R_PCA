@@ -6,7 +6,6 @@ Created on Sun Feb  6 15:38:39 2022
 """
 import numpy as np
 import scipy.linalg
-import scipy.sparse
 
 def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0):
     
@@ -68,7 +67,6 @@ def my_CCA(X,Y,n):
 
     R = c11_inv_sqrt@c12@c22_inv_sqrt
     eigenvalue,eigenvector = np.linalg.eig(R.T@R)
-    print(eigenvalue)
     a_t = c11_inv_sqrt@eigenvector
     b_t = c22_inv_sqrt@eigenvector
     
@@ -84,4 +82,23 @@ def my_CCA(X,Y,n):
 
 
 if __name__=='__main__':
-    1
+    import matplotlib.pyplot as plt
+    from sklearn.cross_decomposition import CCA
+    
+    x = np.load('balanced-MNIST.npy')
+    x = x/255
+    x = (x - x.mean(axis=0))
+    X = x[:,300:335]
+    Y = x[:,400:435]
+    
+    a,b,list1,list2,corr_list = streamingCCA(X, Y)
+    cca = CCA(n_components=1)
+    cca.fit(X, Y)
+    X_c, Y_c = cca.transform(X, Y)
+    
+    plt.plot(np.array(list(range(1,1129)))*100,corr_list,label='streaming method')
+    plt.plot([100,112800],[np.corrcoef(X_c.T,Y_c.T)[1,0],np.corrcoef(X_c.T,Y_c.T)[1,0]],label='built-in cca function')
+    plt.xlabel('iterations')
+    plt.ylabel('correlation')
+    plt.legend()
+    plt.show()
