@@ -10,7 +10,7 @@ from geneig import *
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cross_decomposition import CCA
-
+'''
 x = np.load('balanced-MNIST.npy')
 x = x/255
 x = (x - x.mean(axis=0))
@@ -29,7 +29,7 @@ Y = latents + np.random.normal(size=6 * length).reshape((length, 6))*0.5
 
 X = X-X.mean(axis=0)
 Y = Y-Y.mean(axis=0)
-'''
+
 '''
 plt.plot(X[:200,0],label='X[:200,0]')
 plt.plot(Y[:200,0],label='Y[:200,0]')
@@ -71,16 +71,16 @@ plt.show()
 '''
 
 n=3
-for eta1 in [0.0001,0.0005,0.001]:
-    for eta2 in [0.001,0.005,0.01]:
+for eta1 in [0.00015,0.00075,0.0035]:
+    for eta2 in [0.001,0.005,0.025]:
         a,b,corr_list = geneig(X,Y,n,eta1,eta2)
         cca = CCA(n_components=n)
         cca.fit(X, Y)
         X_c, Y_c = cca.transform(X, Y)
         
         for i in range(n):
-            plt.plot(np.array(list(range(1,length//100+1-4)))*100,corr_list[:,i],label='{}th streaming'.format(i))
-            plt.plot([100,length],[np.corrcoef(X_c.T,Y_c.T)[n+i,i],np.corrcoef(X_c.T,Y_c.T)[n+i,i]],label='{}th theoretical'.format(i))
+            plt.plot(np.array(list(range(1,length//100+1-4)))*100,corr_list[:,i],label='{}th streaming'.format(i+1))
+            plt.plot([100,length],[np.corrcoef(X_c.T,Y_c.T)[n+i,i],np.corrcoef(X_c.T,Y_c.T)[n+i,i]],label='{}th theoretical'.format(i+1))
             plt.xlabel('iterations')
             plt.ylabel('correlation')
             plt.title('correlation vs iteration,$\eta_1$={} $\eta_2$={}'.format(eta1,eta2))
