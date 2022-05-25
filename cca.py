@@ -7,7 +7,7 @@ Created on Sun Feb  6 15:38:39 2022
 import numpy as np
 import scipy.linalg
 
-def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0):
+def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0,iterations = False):
     
     length,m = X.shape
     
@@ -22,8 +22,13 @@ def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0):
     list1 = []
     list2 = []
     corr_list = []
+    
+    if iterations==False:
+        max_iter = length//100
+    else:
+        max_iter = iterations//100
         
-    for j in range(length//100):
+    for j in range(max_iter):
         for i in range(100):
     
             ind = j*100+i
@@ -35,8 +40,8 @@ def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0):
             c11 = np.outer(x,x)
             c22 = np.outer(y,y)
             
-            a += eta1*(c12@b-l1*(c11@a))
-            b += eta1*(c12.T@a-l2*(c22@b))
+            a += eta1*(c12@b-2*l1*(c11@a))
+            b += eta1*(c12.T@a-2*l2*(c22@b))
             l1 += eta2*(a.T@c11@a-1)
             l2 += eta2*(b.T@c22@b-1)
     
@@ -80,8 +85,8 @@ def streamingCCA_modified(X,Y,eta11=0.005,eta12=0.005,eta21=0.001,eta22=0.001,in
             c11 = np.outer(x,x)
             c22 = np.outer(y,y)
             
-            a += eta11*(c12@b-l1*(c11@a))
-            b += eta11*(c12.T@a-l2*(c22@b))
+            a += eta11*(c12@b-2*l1*(c11@a))
+            b += eta11*(c12.T@a-2*l2*(c22@b))
             l1 += eta12*(a.T@c11@a-1)
             l2 += eta12*(b.T@c22@b-1)
     
@@ -105,8 +110,8 @@ def streamingCCA_modified(X,Y,eta11=0.005,eta12=0.005,eta21=0.001,eta22=0.001,in
             c11 = np.outer(x,x)
             c22 = np.outer(y,y)
             
-            a += eta21*(c12@b-l1*(c11@a))
-            b += eta21*(c12.T@a-l2*(c22@b))
+            a += eta21*(c12@b-2*l1*(c11@a))
+            b += eta21*(c12.T@a-2*l2*(c22@b))
             l1 += eta22*(a.T@c11@a-1)
             l2 += eta22*(b.T@c22@b-1)
     

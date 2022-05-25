@@ -9,6 +9,8 @@ from cca import *
 from geneig import *
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
 from sklearn.cross_decomposition import CCA
 '''
 x = np.load('balanced-MNIST.npy')
@@ -30,7 +32,6 @@ Y = latents + np.random.normal(size=6 * length).reshape((length, 6))*0.5
 X = X-X.mean(axis=0)
 Y = Y-Y.mean(axis=0)
 
-'''
 plt.plot(X[:200,0],label='X[:200,0]')
 plt.plot(Y[:200,0],label='Y[:200,0]')
 plt.legend()
@@ -43,17 +44,31 @@ plt.legend()
 plt.title('first 200 points in the second column')
 plt.show()
 
-eta1=0.0025
-eta2=0.0005
-init_l1=0
-init_l2=0
-
-
-a,b,list1,list2,corr_list = streamingCCA(X,Y,eta1,eta2,init_l1,init_l2)
 cca = CCA(n_components=1)
 cca.fit(X, Y)
 X_c, Y_c = cca.transform(X, Y)
+true_corr = np.corrcoef(X_c.T,Y_c.T)[1,0]
 
+init_l1=0
+init_l2=0
+
+eta1_list = np.linspace(0.00001,0.1,24)
+eta2_list = np.linspace(0.00001,0.1,24)
+corr_mat = np.zeros((len(eta1_list),len(eta1_list)))
+
+for it in [200,4000,8000,16000,32000]:
+    for i in range(len(eta1_list)):
+        print(it,i)
+        for j in range(len(eta2_list)):
+            u,v,list1,list2,corr_list = streamingCCA(X,Y,eta1_list[i],eta2_list[j],init_l1,init_l2,iterations=it)
+            corr_mat[i,j] = np.abs(corr_list[-1]-true_corr)
+    
+    np.save('{} iterations,Snythetic'.format(it),corr_mat)
+    corr_df = pd.DataFrame(data=corr_mat,index=np.round(eta1_list,5), columns=np.round(eta2_list,5))
+    fig = sns.heatmap(corr_df,xticklabels=11, yticklabels=11)
+    fig.set(xlabel='$\eta_1$',ylabel='$\eta_2$',title = '{} iterations'.format(it))
+    plt.show()
+'''
 plt.plot(np.array(list(range(1,length//100+1)))*100,corr_list,label='streaming method')
 plt.plot([100,length],[np.corrcoef(X_c.T,Y_c.T)[1,0],np.corrcoef(X_c.T,Y_c.T)[1,0]],label='built-in cca function')
 plt.xlabel('iterations')
@@ -70,6 +85,7 @@ plt.title('$\lambda$ vs iteration,$\eta_1$={} $\eta_2$={}'.format(eta1,eta2))
 plt.show()
 '''
 
+'''
 n=3
 for eta1 in [0.00015,0.00075,0.0035]:
     for eta2 in [0.001,0.005,0.025]:
@@ -86,3 +102,4 @@ for eta1 in [0.00015,0.00075,0.0035]:
             plt.title('correlation vs iteration,$\eta_1$={} $\eta_2$={}'.format(eta1,eta2))
             plt.legend()
         plt.show()
+'''
