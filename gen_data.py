@@ -42,7 +42,7 @@ def centralize(X):
 
 def init_V(ncol,num):
     
-    V = np.random.randn(ncol+2,num)
+    V = np.random.randn(ncol,num)
     V,_ = np.linalg.qr(V, mode='reduced')
 
     return V

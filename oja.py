@@ -6,7 +6,7 @@ Created on Mon Jan 10 19:48:20 2022
 """
 import numpy as np
 
-def oja1(X, V, eta=0.01):
+def ojafunc(X, V, eta=0.01):
     
     t,length = X.shape
     

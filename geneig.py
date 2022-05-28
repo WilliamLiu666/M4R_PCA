@@ -6,7 +6,7 @@ Created on Sat Apr 23 17:19:25 2022
 """
 import numpy as np
 
-def geneig(X,Y,n,eta_1=0.0005,eta_2=0.005):
+def genoja(X,Y,n,eta_1=0.0005,eta_2=0.005,iterations = False):
     
     length,m = X.shape
     np.random.seed(999999999)
@@ -15,9 +15,14 @@ def geneig(X,Y,n,eta_1=0.0005,eta_2=0.005):
     U = np.random.randn(m*2,n)
     U,_ = np.linalg.qr(U, mode='reduced')
     
-    corr_mat = np.zeros((length//100-4,n))
+    if iterations==False:
+        max_iter = length//100
+    else:
+        max_iter = iterations//100
+        
+    corr_mat = np.zeros((max_iter,n))
     
-    for j in range(length//100-4):
+    for j in range(max_iter):
         for i in range(100):
             
             ind = j*100+i
@@ -66,7 +71,7 @@ def geneig(X,Y,n,eta_1=0.0005,eta_2=0.005):
 
     return a,b,corr_mat
 
-def geneig_modified(X,Y,n,eta_1=0.0005,eta_2=0.005):
+def genoja_modified(X,Y,n,eta_1=0.0005,eta_2=0.005):
     
     length,m = X.shape
     np.random.seed(999999999)
@@ -145,13 +150,13 @@ if __name__=='__main__':
     
     n=3
     
-    a,b,corr_list = geneig(X,Y,n,eta_1=0.0005,eta_2=0.005)
+    a,b,corr_list = genoja(X,Y,n,eta_1=0.0005,eta_2=0.005)
     cca = CCA(n_components=n)
     cca.fit(X, Y)
     X_c, Y_c = cca.transform(X, Y)
     
     for i in range(n):
-        plt.plot(np.array(list(range(1,length//100+1-4)))*100,corr_list[:,i],label='streaming')
+        plt.plot(np.array(list(range(1,length//100+1)))*100,corr_list[:,i],label='streaming')
         plt.plot([100,50000],[np.corrcoef(X_c.T,Y_c.T)[n+i,i],np.corrcoef(X_c.T,Y_c.T)[n+i,i]],label='built-in')
         plt.xlabel('iterations')
         plt.ylabel('correlation')

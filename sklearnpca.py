@@ -9,7 +9,7 @@ import time
 
 def true_pca(x,ncol,num):
     pca_start = time.time()
-    pca = PCA(n_components=(ncol+2), svd_solver='full')
+    pca = PCA(n_components=(ncol), svd_solver='full')
     pca.fit(x)
     pca_end = time.time()
     result = pca.components_.T
