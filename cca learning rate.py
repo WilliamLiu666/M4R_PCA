@@ -64,7 +64,7 @@ eta1_list = np.linspace(0.00001,0.1,49)
 eta2_list = np.linspace(0.00001,0.1,49)
 corr_mat = np.zeros((len(eta1_list),len(eta1_list)))
 
-for it in [200]:
+for it in [400,800,1600,3200]:
     for i in range(len(eta1_list)):
         print(it,i)
         for j in range(len(eta2_list)):
