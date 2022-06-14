@@ -40,8 +40,9 @@ for i in range(it):
     error_mat[i,:] = np.abs(var_mat[i,:]-pca_obj.explained_variance_[:num])
     
     
+color_list=['blue','g','r']    
 for i in range(num):
-    plt.plot(np.array(range(it))*10,error_mat[:,i],label='{}th'.format(i))
+    plt.plot(np.array(range(it))*10,error_mat[:,i],color=color_list[i],label='{}th'.format(i))
 
 plt.title('Error plot')
 plt.xlabel('Iteration')
@@ -49,10 +50,9 @@ plt.ylabel('Error')
 plt.legend()
 plt.show()
 
-
 for i in range(num):
-    plt.plot(np.array(range(it))*10,var_mat[:,i],label='{}th streaming'.format(i))
-    plt.plot([0,it*10],[pca_obj.explained_variance_[i],pca_obj.explained_variance_[i]],label='{}th theoretical'.format(i))
+    plt.plot(np.array(range(it))*10,var_mat[:,i],color=color_list[i],label='{}th streaming'.format(i))
+    plt.plot([0,it*10],[pca_obj.explained_variance_[i],pca_obj.explained_variance_[i]],color=color_list[i],linestyle='dashed',label='{}th theoretical'.format(i))
 
 plt.title('Variance plot')
 plt.xlabel('Iteration')

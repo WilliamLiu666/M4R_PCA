@@ -55,75 +55,6 @@ def streamingCCA(X,Y,eta1=0.0025,eta2=0.0005,init_l1=0,init_l2=0,iterations = Fa
         
     return a,b,list1,list2,corr_list
 
-def streamingCCA_modified(X,Y,eta11=0.005,eta12=0.005,eta21=0.001,eta22=0.001,init_l1=0,init_l2=0):
-    
-    length,m = X.shape
-    
-    a = np.random.randn(m,1)
-    a,_ = np.linalg.qr(a, mode='reduced')
-    b = np.random.randn(m,1)
-    b,_ = np.linalg.qr(b, mode='reduced')
-
-    l1 = init_l1
-    l2 = init_l2
-    
-    list1 = []
-    list2 = []
-    corr_list = []
-    
-    it = length//100
-        
-    for j in range(it//15):
-        for i in range(100):
-    
-            ind = j*100+i
-            
-            x = X[ind,:]
-            y = Y[ind,:]
-            
-            c12 = np.outer(x,y)
-            c11 = np.outer(x,x)
-            c22 = np.outer(y,y)
-            
-            a += eta11*(c12@b-2*l1*(c11@a))
-            b += eta11*(c12.T@a-2*l2*(c22@b))
-            l1 += eta12*(a.T@c11@a-1)
-            l2 += eta12*(b.T@c22@b-1)
-    
-        X_s = X@a
-        Y_s = Y@b    
-        list1.append(float(l1.copy()))
-        list2.append(float(l2.copy()))
-        
-        corr_list.append(np.corrcoef(X_s.T,Y_s.T)[1,0])
-        
-        
-    for j in range(it//15,it):
-        for i in range(100):
-    
-            ind = j*100+i
-            
-            x = X[ind,:]
-            y = Y[ind,:]
-            
-            c12 = np.outer(x,y)
-            c11 = np.outer(x,x)
-            c22 = np.outer(y,y)
-            
-            a += eta21*(c12@b-2*l1*(c11@a))
-            b += eta21*(c12.T@a-2*l2*(c22@b))
-            l1 += eta22*(a.T@c11@a-1)
-            l2 += eta22*(b.T@c22@b-1)
-    
-        X_s = X@a
-        Y_s = Y@b    
-        list1.append(float(l1.copy()))
-        list2.append(float(l2.copy()))
-        
-        corr_list.append(np.corrcoef(X_s.T,Y_s.T)[1,0])
-
-        
-    return a,b,list1,list2,corr_list
     
 def my_CCA(X,Y,n):
     
@@ -172,13 +103,13 @@ if __name__=='__main__':
     X = X-X.mean(axis=0)
     Y = Y-Y.mean(axis=0)
     
-    a,b,list1,list2,corr_list = streamingCCA_modified(X, Y,eta11=0.005,eta12=0.005,eta21=0.0015,eta22=0.0015,init_l1=0,init_l2=0)
+    a,b,list1,list2,corr_list = streamingCCA(X, Y,eta1=0.00001,eta2=0.01,init_l1=0,init_l2=0)
     cca = CCA(n_components=1)
     cca.fit(X, Y)
     X_c, Y_c = cca.transform(X, Y)
     
     plt.plot(np.array(list(range(1,length//100+1)))*100,corr_list,label='streaming method')
-    plt.plot([100,50000],[np.corrcoef(X_c.T,Y_c.T)[1,0],np.corrcoef(X_c.T,Y_c.T)[1,0]],label='built-in cca function')
+    plt.plot([100,length],[np.corrcoef(X_c.T,Y_c.T)[1,0],np.corrcoef(X_c.T,Y_c.T)[1,0]],label='built-in cca function')
     plt.xlabel('iterations')
     plt.ylabel('correlation')
     plt.title('mixed learning rate')
@@ -189,5 +120,5 @@ if __name__=='__main__':
     plt.plot(np.array(list(range(1,length//100+1)))*100,list2,label='$\lambda_2$')
     plt.xlabel('iterations')
     plt.legend()
-    plt.title('mixed learning rate')
+    plt.title('$\eta_1=0.00001,\eta_2=0.01$')
     plt.show()

@@ -14,7 +14,7 @@ import pandas as pd
 from sklearn.cross_decomposition import CCA
 
 
-
+'''
 #EMNIST dataset
 x = np.load('balanced-MNIST.npy')
 x = x/255
@@ -48,9 +48,9 @@ plt.plot(Y[:200,1],label='Y[:200,1]')
 plt.legend()
 plt.title('first 200 points in the second column')
 plt.show()
-'''
 
-'''
+
+
 #streamingCCA method
 cca = CCA(n_components=1)
 cca.fit(X, Y)
@@ -60,11 +60,11 @@ true_corr = np.corrcoef(X_c.T,Y_c.T)[1,0]
 init_l1=0
 init_l2=0
 
-eta1_list = np.linspace(0.00001,0.1,24)
-eta2_list = np.linspace(0.00001,0.1,24)
+eta1_list = np.linspace(0.00001,0.1,49)
+eta2_list = np.linspace(0.00001,0.1,49)
 corr_mat = np.zeros((len(eta1_list),len(eta1_list)))
 
-for it in [200,400,800,1600,3200]:
+for it in [200]:
     for i in range(len(eta1_list)):
         print(it,i)
         for j in range(len(eta2_list)):
@@ -76,10 +76,10 @@ for it in [200,400,800,1600,3200]:
     fig = sns.heatmap(corr_df,xticklabels=11, yticklabels=11)
     fig.set(xlabel='$\eta_1$',ylabel='$\eta_2$',title = '{} iterations'.format(it))
     plt.show()
+
+
+
 '''
-
-
-
 n=3
 cca = CCA(n_components=n)
 cca.fit(X, Y)
@@ -90,7 +90,7 @@ eta1_list = np.linspace(0.00001,0.1,49)
 eta2_list = np.linspace(0.00001,0.1,49)
 corr_mat = np.zeros((n,len(eta1_list),len(eta1_list)))
 
-for it in [200,400,800,1600,3200,6400]:
+for it in [400,800,1600,3200]:
     for i in range(len(eta1_list)):
         print(it,i)
         for j in range(len(eta2_list)):
@@ -100,7 +100,8 @@ for it in [200,400,800,1600,3200,6400]:
     
     np.save('{} iterations,Snythetic,GenOja'.format(it),corr_mat)
     for ind in range(n):
-        corr_df = pd.DataFrame(data=corr_mat[ind,:,:],index=np.round(eta1_list,5), columns=np.round(eta2_list,5))
+        corr_df = pd.DataFrame(data=np.log(corr_mat[ind,:,:]),index=np.round(eta1_list,5), columns=np.round(eta2_list,5))
         fig = sns.heatmap(corr_df,xticklabels=11, yticklabels=11)
-        fig.set(xlabel='$\eta_1$',ylabel='$\eta_2$',title = '{} iterations on the {}th component'.format(it,ind))
+        fig.set(xlabel='$\eta_1$',ylabel='$\eta_2$',title = 'Log error of {} iterations on the {}th component'.format(it,ind))
         plt.show()
+'''
