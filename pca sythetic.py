@@ -10,8 +10,6 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from oja import *
 from gen_data import *
-from sklearnpca import *
-from errorplot import *
 
 
 x = tf.keras.datasets.cifar10.load_data()[0][0]
