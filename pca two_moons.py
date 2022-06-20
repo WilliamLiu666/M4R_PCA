@@ -25,7 +25,7 @@ x = x@r.T
 
 #centralize the data
 xn =  x-np.mean(x,axis=0)
-num = 2
+num = 3
 it = 1000
 
 #theoretical pca value
@@ -36,13 +36,13 @@ pca = pca_obj.components_.T[:,:num]
 #initialzation
 error_mat = np.zeros((it,num))
 var_mat = np.zeros((it,num))
-V = init_V(102,num)
+V = np.random.randn(102,num)
+V,_ = np.linalg.qr(V, mode='reduced')
 var_mat[0,:] = np.diag(V.T@xn.T@xn@V/50000)
 error_mat[0,:] = np.abs(var_mat[0,:]-pca_obj.explained_variance_[:num])
 
 #Oja
 for i in range(it):
-    print(i)
     V = ojafunc(xn[i*10:(i+1)*10,:], V ,0.005)
     var_mat[i,:] = np.diag(V.T@xn.T@xn@V/10000)
     error_mat[i,:] = np.abs(var_mat[i,:]-pca_obj.explained_variance_[:num])
@@ -52,7 +52,7 @@ color_list=['blue','g','r']
 
 #error plot
 for i in range(num):
-    plt.plot(np.array(range(it))*10,error_mat[:,i],color=color_list[i],label='{}th'.format(i))
+    plt.plot(np.array(range(it))*10,error_mat[:,i],color=color_list[i],label='{}th'.format(i+1))
 plt.title('Error plot')
 plt.xlabel('Iteration')
 plt.ylabel('Error')
@@ -61,8 +61,8 @@ plt.show()
 
 #variance plot
 for i in range(num):
-    plt.plot(np.array(range(it))*10,var_mat[:,i],color=color_list[i],label='{}th streaming'.format(i))
-    plt.plot([0,it*10],[pca_obj.explained_variance_[i],pca_obj.explained_variance_[i]],color=color_list[i],linestyle='dashed',label='{}th theoretical'.format(i))
+    plt.plot(np.array(range(it))*10,var_mat[:,i],color=color_list[i],label='{}th streaming'.format(i+1))
+    plt.plot([0,it*10],[pca_obj.explained_variance_[i],pca_obj.explained_variance_[i]],color=color_list[i],linestyle='dashed',label='{}th theoretical'.format(i+1))
 plt.title('Variance plot')
 plt.xlabel('Iteration')
 plt.ylabel('Variance')

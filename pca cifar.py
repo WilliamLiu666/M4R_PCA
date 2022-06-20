@@ -9,6 +9,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from oja import *
+from sklearn.decomposition import PCA
 
 #load cifar data
 x = tf.keras.datasets.cifar10.load_data()[0][0]
@@ -41,7 +42,8 @@ plt.show()
 #initialzation
 error_mat = np.zeros((it,num))
 var_mat = np.zeros((it,num))
-V = init_V(n_features,num)
+V = np.random.randn(n_features,num)
+V,_ = np.linalg.qr(V, mode='reduced')
 var_mat[0,:] = np.diag(V.T@xn.T@xn@V/50000)
 error_mat[0,:] = np.abs(var_mat[0,:]-pca_obj.explained_variance_[:num])
 
@@ -57,7 +59,7 @@ color_list=['blue','g','r']
 
 #error plot
 for i in range(num):
-    plt.plot(np.array(range(it))*10,error_mat[:,i],color=color_list[i],label='{}th'.format(i))
+    plt.plot(np.array(range(it))*10,error_mat[:,i],color=color_list[i],label='{}th'.format(i+1))
 plt.title('Error plot')
 plt.xlabel('Iteration')
 plt.ylabel('Error')
@@ -67,7 +69,7 @@ plt.show()
 
 #variance plot
 for i in range(num):
-    plt.plot(np.array(range(it))*10,var_mat[:,i],color=color_list[i],label='{}th streaming'.format(i))
+    plt.plot(np.array(range(it))*10,var_mat[:,i],color=color_list[i],label='{}th streaming'.format(i+1))
     plt.plot([0,it*10],[pca_obj.explained_variance_[i],pca_obj.explained_variance_[i]],color=color_list[i],linestyle='dashed',label='{}th theoretical'.format(i))
 
 plt.title('Variance plot')
